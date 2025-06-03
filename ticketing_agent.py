@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 import os
@@ -13,13 +13,17 @@ os.makedirs(CHAT_HISTORY_DIR, exist_ok=True)
 client = OpenAI()
 app = FastAPI()
 
+EXPECTED_API_KEY = os.getenv("WHOP_CHATBOT_API_KEY") # You'll set this in Render env vars
+
 class ChatRequest(BaseModel):
     question: str
     user_id: str
     ticket_id: Optional[str] = None  # If None, create a new ticket
 
 @app.post("/user_chat")
-def user_chat(req: ChatRequest):
+async def user_chat(req: ChatRequest, x_api_key: Optional[str] = Header(None)):
+    if EXPECTED_API_KEY and x_api_key != EXPECTED_API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid API Key")
     # Determine ticket_id
     ticket_id = req.ticket_id or f"{req.user_id}_{int(time.time())}"
     history_path = os.path.join(CHAT_HISTORY_DIR, f"{ticket_id}.json")
@@ -55,7 +59,9 @@ def user_chat(req: ChatRequest):
     return {"answer": answer, "ticket_id": ticket_id, "history": history}
 
 @app.get("/user_tickets/{user_id}")
-def list_tickets(user_id: str):
+async def list_tickets(user_id: str, x_api_key: Optional[str] = Header(None)):
+    if EXPECTED_API_KEY and x_api_key != EXPECTED_API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid API Key")
     # List all ticket files for this user
     tickets = []
     for fname in os.listdir(CHAT_HISTORY_DIR):

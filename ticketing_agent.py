@@ -7,7 +7,9 @@ import time
 from my_vectordb import retriever
 from openai import OpenAI
 
-CHAT_HISTORY_DIR = os.path.join(os.path.dirname(__file__), '../chat_histories')
+# This path assumes that 'ticketing_agent.py' is at the root of your app on Render (e.g., /app/ticketing_agent.py)
+# and your chat histories disk is mounted as a directory named 'chat_histories' also at the root (e.g., /app/chat_histories).
+CHAT_HISTORY_DIR = "chat_histories"
 os.makedirs(CHAT_HISTORY_DIR, exist_ok=True)
 
 client = OpenAI()

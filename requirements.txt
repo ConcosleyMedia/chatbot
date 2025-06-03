@@ -3,6 +3,7 @@ uvicorn
 openai
 langchain
 langchain-community
+langchain-openai
 python-dotenv
 PyPDF2
 beautifulsoup4

@@ -18,6 +18,8 @@ services:
       sizeGB: 1
       # Add another disk for chat_histories
       # Uncomment if you want chat history persistence
-      #- name: chat-histories
+      - name: chat-histories
+        mountPath: /app/chat_histories
+        sizeGB: 1
       #  mountPath: /app/chat_histories
       #  sizeGB: 1
